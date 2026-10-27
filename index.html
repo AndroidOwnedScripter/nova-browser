@@ -1,0 +1,473 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101116">
+  <title>NOVA Browser</title>
+
+  <style>
+    :root {
+      --bg: #101116;
+      --panel: #191a22;
+      --panel2: #22232e;
+      --border: #30313e;
+      --text: #f5f5fa;
+      --muted: #a1a2b5;
+      --accent: #a99aff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at top, #25203b 0%, transparent 48%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, Arial, sans-serif;
+    }
+
+    .app {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #b8a6ff, #7864ed);
+      color: #171323;
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: -0.7px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .window {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 24px 80px #0006;
+    }
+
+    .window-top {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #626373;
+    }
+
+    .dot:first-child { background: #ff6b70; }
+    .dot:nth-child(2) { background: #ffc45b; }
+    .dot:nth-child(3) { background: #55d99a; }
+
+    .window-label {
+      margin: auto;
+      margin-left: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: #15161d;
+      border-bottom: 1px solid var(--border);
+    }
+
+    button {
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 13px;
+      background: var(--panel2);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+    }
+
+    button:hover {
+      background: #353044;
+      border-color: #77709e;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .address-wrap {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #20212b;
+      padding: 0 12px;
+    }
+
+    .address-wrap span {
+      color: var(--accent);
+    }
+
+    #address {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: none;
+      padding: 12px 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    #address:focus-visible {
+      outline: none;
+    }
+
+    .go {
+      background: var(--accent);
+      color: #171323;
+      border-color: transparent;
+      font-weight: 750;
+    }
+
+    .go:hover {
+      background: #c1b5ff;
+    }
+
+    .quick-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .quick-links button {
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+
+    .viewer {
+      position: relative;
+      height: min(68vh, 720px);
+      min-height: 360px;
+      background: #fff;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+      background: white;
+    }
+
+    .welcome {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 12px;
+      padding: 24px;
+      background: #171821;
+      text-align: center;
+    }
+
+    .welcome .symbol {
+      display: grid;
+      place-items: center;
+      width: 64px;
+      height: 64px;
+      border: 1px solid #45405e;
+      border-radius: 20px;
+      background: #272338;
+      color: var(--accent);
+      font-size: 28px;
+    }
+
+    .welcome h2 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    .welcome p {
+      max-width: 420px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 15px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #6edca3;
+    }
+
+    .status span:last-child {
+      margin-left: auto;
+    }
+
+    .notice {
+      margin-top: 15px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 600px) {
+      .app { padding: 12px; }
+      .toolbar { flex-wrap: wrap; }
+      .address-wrap { order: 1; flex-basis: 100%; }
+      .go { order: 2; }
+      .viewer { min-height: 400px; height: 65vh; }
+      .window-label { text-align: right; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="logo">N</div>
+      <div>
+        <h1>NOVA Browser</h1>
+        <div class="subtitle">A little window to the web</div>
+      </div>
+    </header>
+
+    <section class="window">
+      <div class="window-top">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="window-label">NOVA · Web Explorer</span>
+      </div>
+
+      <form class="toolbar" id="navForm">
+        <button type="button" id="back" title="Retour"
+          aria-label="Retour">←</button>
+        <button type="button" id="forward" title="Suivant"
+          aria-label="Suivant">→</button>
+        <button type="button" id="reload" title="Recharger"
+          aria-label="Recharger">↻</button>
+
+        <div class="address-wrap">
+          <span>⌕</span>
+          <input id="address" type="text"
+            placeholder="Entre l'adresse d'un site..."
+            value="https://example.com"
+            aria-label="Adresse du site">
+        </div>
+
+        <button class="go" type="submit">Ouvrir ↗</button>
+      </form>
+
+      <div class="quick-links">
+        <button type="button" data-url="https://example.com">
+          Exemple
+        </button>
+        <button type="button" data-url="https://www.wikipedia.org">
+          Wikipédia
+        </button>
+        <button type="button" id="external">
+          Nouvel onglet ↗
+        </button>
+      </div>
+
+      <div class="viewer">
+        <iframe
+          id="browser"
+          title="Site web intégré"
+          src="about:blank"
+          referrerpolicy="no-referrer"
+          sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+        </iframe>
+
+        <div class="welcome" id="welcome">
+          <div class="symbol">✧</div>
+          <h2>Explore le web.</h2>
+          <p>
+            Entre une adresse dans la barre ci-dessus
+            pour essayer d'afficher un site dans cette fenêtre.
+          </p>
+          <button type="button" id="start">
+            Ouvrir un exemple →
+          </button>
+        </div>
+      </div>
+
+      <div class="status">
+        <span class="status-dot"></span>
+        <span id="statusText">NOVA est prêt</span>
+        <span>Mode intégré</span>
+      </div>
+    </section>
+
+    <p class="notice">
+      Certains sites bloquent l'intégration. Si une page reste vide,
+      utilise « Nouvel onglet » pour l'ouvrir directement.
+      NOVA est une interface web, pas un navigateur indépendant.
+    </p>
+  </main>
+
+  <script>
+    const form = document.getElementById("navForm");
+    const address = document.getElementById("address");
+    const browser = document.getElementById("browser");
+    const welcome = document.getElementById("welcome");
+    const statusText = document.getElementById("statusText");
+
+    let currentUrl = "";
+
+    function normalizeUrl(value) {
+      let input = value.trim();
+
+      if (!input) return null;
+
+      if (!/^https?:\/\//i.test(input)) {
+        input = "https://" + input;
+      }
+
+      try {
+        const url = new URL(input);
+
+        if (!["http:", "https:"].includes(url.protocol)) {
+          return null;
+        }
+
+        return url.href;
+      } catch {
+        return null;
+      }
+    }
+
+    function openSite(value) {
+      const url = normalizeUrl(value);
+
+      if (!url) {
+        statusText.textContent = "Adresse invalide";
+        return;
+      }
+
+      currentUrl = url;
+      address.value = url;
+      welcome.hidden = true;
+      statusText.textContent = "Chargement demandé…";
+
+      browser.src = url;
+    }
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      openSite(address.value);
+    });
+
+    document.getElementById("start").addEventListener("click", () => {
+      openSite("https://example.com");
+    });
+
+    document.querySelectorAll("[data-url]").forEach(button => {
+      button.addEventListener("click", () => {
+        openSite(button.dataset.url);
+      });
+    });
+
+    document.getElementById("reload").addEventListener("click", () => {
+      if (currentUrl) {
+        browser.src = currentUrl;
+        statusText.textContent = "Rechargement demandé…";
+      }
+    });
+
+    document.getElementById("back").addEventListener("click", () => {
+      try {
+        browser.contentWindow.history.back();
+      } catch {
+        statusText.textContent =
+          "Retour indisponible pour cette page";
+      }
+    });
+
+    document.getElementById("forward").addEventListener("click", () => {
+      try {
+        browser.contentWindow.history.forward();
+      } catch {
+        statusText.textContent =
+          "Navigation suivante indisponible";
+      }
+    });
+
+    document.getElementById("external").addEventListener("click", () => {
+      const url = normalizeUrl(address.value);
+
+      if (!url) {
+        statusText.textContent = "Adresse invalide";
+        return;
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+
+    browser.addEventListener("load", () => {
+      statusText.textContent =
+        "Navigation terminée ou bloquée par le site";
+    });
+  </script>
+</body>
+</html>
